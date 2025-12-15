@@ -1,0 +1,14 @@
+BasedOnStyle: LLVM
+UseTab: Always
+IndentWidth: 2
+TabWidth: 2
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: WithoutElse
+IndentCaseLabels: true
+ColumnLimit: 0
+NamespaceIndentation: All
+FixNamespaceComments: false
+Cpp11BracedListStyle: false
+SpaceBeforeCpp11BracedList: true
+DerivePointerAlignment: false
+PointerAlignment: Left

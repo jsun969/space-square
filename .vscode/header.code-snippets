@@ -1,0 +1,17 @@
+{
+	"Template":{
+		"scope": "cpp",
+		"prefix": "header",
+		"body": [
+			"#pragma once",
+			"",
+			"namespace spsq {",
+			"",
+			"class ${1:ClassName} {",
+			"};",
+			"",
+			"} // namespace spsq"
+		],
+		"description": "Header file template"
+	}
+}

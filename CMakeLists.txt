@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.29.0)
 
-project(SpaceSquare VERSION 1.0)
+project(spsq VERSION 0.0.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -23,10 +23,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fmt)
  
-add_executable(SpaceSquare main.cpp)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+add_executable(spsq ${SOURCES})
 
-target_link_libraries(SpaceSquare PRIVATE fmt::fmt)
-target_link_libraries(SpaceSquare
+target_link_libraries(spsq PRIVATE fmt::fmt)
+target_link_libraries(spsq
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component

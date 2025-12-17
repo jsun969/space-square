@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -14,7 +15,7 @@ enum class FileType {
 struct File {
 	std::string name;
 	std::string path;
-	int size_bytes;
+	std::uintmax_t size_bytes;
 	FileType type;
 	std::vector<File> children;
 };

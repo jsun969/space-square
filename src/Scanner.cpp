@@ -47,7 +47,7 @@ File Scanner::scan(std::string rootPath, int depth) {
 					child.size_bytes = 0;
 				} else if (entry.is_regular_file()) {
 					child.type = FileType::File;
-					child.size_bytes = static_cast<int>(entry.file_size());
+					child.size_bytes = entry.file_size();
 				} else {
 					child.type = FileType::Other;
 					child.size_bytes = 0;

@@ -22,6 +22,13 @@ FetchContent_Declare(
   GIT_TAG 12.1.0
 )
 FetchContent_MakeAvailable(fmt)
+
+FetchContent_Declare(
+  cxxopts
+  GIT_REPOSITORY https://github.com/jarro2783/cxxopts
+  GIT_TAG v3.3.1
+)
+FetchContent_MakeAvailable(cxxopts)
  
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(spsq ${SOURCES})
@@ -32,3 +39,4 @@ target_link_libraries(spsq
   PRIVATE ftxui::dom
   PRIVATE ftxui::component
 )
+target_link_libraries(spsq PRIVATE cxxopts::cxxopts)

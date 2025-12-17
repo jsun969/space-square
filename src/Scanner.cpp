@@ -24,6 +24,7 @@ File Scanner::scan(std::string rootPath, int depth) {
 	root.type = FileType::Directory;
 	root.size_bytes = 0; // FIXME: directory size can't be determined here
 
+	// BFS scan directories
 	std::queue<File*> q;
 	q.push(&root);
 

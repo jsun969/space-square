@@ -10,11 +10,21 @@ namespace fs = std::filesystem;
 
 std::uintmax_t Scanner::calcDirSize(const std::string& path) {
 	std::uintmax_t size = 0;
-	for (const auto& entry : fs::recursive_directory_iterator(
-					 path, fs::directory_options::skip_permission_denied)) {
-		if (entry.is_regular_file()) {
-			size += entry.file_size();
+	try {
+		for (const auto& entry : fs::recursive_directory_iterator(
+						 path, fs::directory_options::skip_permission_denied)) {
+			try {
+				if (entry.is_regular_file()) {
+					size += entry.file_size();
+				}
+			} catch (const fs::filesystem_error&) {
+				// Skip files we can't access
+				// TODO
+			}
 		}
+	} catch (const fs::filesystem_error&) {
+		// Can't access directory at all
+		// TODO
 	}
 	return size;
 }
@@ -67,23 +77,34 @@ File Scanner::scan(std::string rootPath, int depth) {
 			levelSize--;
 
 			fs::path currentPath(currentFile->path);
-			for (const auto& entry : fs::directory_iterator(currentPath)) {
-				File child;
-				child.name = entry.path().filename().string();
-				child.path = fs::absolute(entry.path()).string();
+			try {
+				for (const auto& entry : fs::directory_iterator(currentPath,
+																												fs::directory_options::skip_permission_denied)) {
+					try {
+						File child;
+						child.name = entry.path().filename().string();
+						child.path = fs::absolute(entry.path()).string();
 
-				if (entry.is_directory()) {
-					child.type = FileType::Directory;
-					child.size_bytes = 0;
-				} else if (entry.is_regular_file()) {
-					child.type = FileType::File;
-					child.size_bytes = entry.file_size();
-				} else {
-					child.type = FileType::Other;
-					child.size_bytes = 0;
+						if (entry.is_directory()) {
+							child.type = FileType::Directory;
+							child.size_bytes = 0;
+						} else if (entry.is_regular_file()) {
+							child.type = FileType::File;
+							child.size_bytes = entry.file_size();
+						} else {
+							child.type = FileType::Other;
+							child.size_bytes = 0;
+						}
+
+						currentFile->children.push_back(std::move(child));
+					} catch (const fs::filesystem_error&) {
+						// Skip files we can't access
+						// TODO
+					}
 				}
-
-				currentFile->children.push_back(std::move(child));
+			} catch (const fs::filesystem_error&) {
+				// Can't access directory at all
+				// TODO
 			}
 
 			for (auto& child : currentFile->children) {
@@ -95,9 +116,10 @@ File Scanner::scan(std::string rootPath, int depth) {
 	}
 
 	// DEBUG
+	// TODO: Print files size (maybe path)
 	fmt::println("Finished scanning up to depth {}", depth);
 	// DEBUG
-	propagateDirSizes(root); // FIXME: Too slow
+	propagateDirSizes(root); // TODO: Use du?
 
 	return root;
 }

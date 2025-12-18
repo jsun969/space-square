@@ -1,11 +1,44 @@
 #include "Scanner.hpp"
 #include <filesystem>
+#include <functional>
 #include <queue>
 #include <stdexcept>
 
 namespace spsq {
 
 namespace fs = std::filesystem;
+
+std::uintmax_t Scanner::calcDirSize(const std::string& path) {
+	std::uintmax_t size = 0;
+	std::function<void(const fs::path&)> calc = [&](const fs::path& p) {
+		for (const auto& entry : fs::directory_iterator(p)) {
+			if (entry.is_regular_file()) {
+				size += entry.file_size();
+			} else if (entry.is_directory()) {
+				calc(entry.path());
+			}
+		}
+	};
+	calc(fs::path(path));
+	return size;
+}
+
+void Scanner::propagateDirSizes(File& file) {
+	if (file.type != FileType::Directory) {
+		return;
+	}
+	if (file.children.empty()) {
+		// Directory file but no children
+		file.size_bytes = calcDirSize(file.path);
+		return;
+	}
+	std::uintmax_t size = 0;
+	for (auto& child : file.children) {
+		propagateDirSizes(child);
+		size += child.size_bytes;
+	}
+	file.size_bytes = size;
+}
 
 File Scanner::scan(std::string rootPath, int depth) {
 	fs::path path(rootPath);
@@ -22,7 +55,7 @@ File Scanner::scan(std::string rootPath, int depth) {
 	if (root.name.empty()) root.name = path.string();
 	root.path = fs::absolute(path).string();
 	root.type = FileType::Directory;
-	root.size_bytes = 0; // FIXME: directory size can't be determined here
+	root.size_bytes = 0;
 
 	// BFS scan directories
 	std::queue<File*> q;
@@ -64,6 +97,8 @@ File Scanner::scan(std::string rootPath, int depth) {
 			}
 		}
 	}
+
+	propagateDirSizes(root); // FIXME: Too slow
 
 	return root;
 }

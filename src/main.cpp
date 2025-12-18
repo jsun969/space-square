@@ -25,9 +25,20 @@ int main(int argc, char* argv[]) {
 	std::string rootPath = result["path"].as<std::string>();
 	int depth = result["depth"].as<int>();
 
+	if (depth < 1 || depth > 9) {
+		fmt::println(stderr, "Error: Depth must be between 1 and 9");
+		return 1;
+	}
+
 	// Scan the directory
 	spsq::Scanner scanner;
-	auto files = scanner.scan(rootPath, depth);
+	spsq::File files;
+	try {
+		files = scanner.scan(rootPath, depth);
+	} catch (const std::runtime_error& e) {
+		fmt::println(stderr, "Error: {}", e.what());
+		return 1;
+	}
 	// DEBUG
 	std::function<void(const spsq::File&, int)> printFile = [&](const spsq::File& file, int indent = 0) {
 		std::string indentStr(indent * 2, ' ');

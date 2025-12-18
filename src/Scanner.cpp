@@ -1,6 +1,6 @@
 #include "Scanner.hpp"
 #include <filesystem>
-#include <functional>
+#include <fmt/core.h>
 #include <queue>
 #include <stdexcept>
 
@@ -10,16 +10,12 @@ namespace fs = std::filesystem;
 
 std::uintmax_t Scanner::calcDirSize(const std::string& path) {
 	std::uintmax_t size = 0;
-	std::function<void(const fs::path&)> calc = [&](const fs::path& p) {
-		for (const auto& entry : fs::directory_iterator(p)) {
-			if (entry.is_regular_file()) {
-				size += entry.file_size();
-			} else if (entry.is_directory()) {
-				calc(entry.path());
-			}
+	for (const auto& entry : fs::recursive_directory_iterator(
+					 path, fs::directory_options::skip_permission_denied)) {
+		if (entry.is_regular_file()) {
+			size += entry.file_size();
 		}
-	};
-	calc(fs::path(path));
+	}
 	return size;
 }
 
@@ -98,6 +94,9 @@ File Scanner::scan(std::string rootPath, int depth) {
 		}
 	}
 
+	// DEBUG
+	fmt::println("Finished scanning up to depth {}", depth);
+	// DEBUG
 	propagateDirSizes(root); // FIXME: Too slow
 
 	return root;

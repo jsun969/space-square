@@ -5,6 +5,8 @@
 #include <functional>
 
 int main(int argc, char* argv[]) {
+	using namespace spsq;
+
 	// Parse command line arguments
 	cxxopts::Options options("spsq", "View your space in squares");
 
@@ -31,8 +33,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Scan the directory
-	spsq::Scanner scanner;
-	spsq::File files;
+	Scanner scanner;
+	File files;
 	try {
 		files = scanner.scan(rootPath, depth);
 	} catch (const std::runtime_error& e) {
@@ -40,10 +42,10 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	// DEBUG
-	std::function<void(const spsq::File&, int)> printFile = [&](const spsq::File& file, int indent = 0) {
+	std::function<void(const File&, int)> printFile = [&](const File& file, int indent = 0) {
 		std::string indentStr(indent * 2, ' ');
-		auto fileTypeStr = file.type == spsq::FileType::Directory ? "Directory" : file.type == spsq::FileType::File ? "File"
-																																																								: "Other";
+		auto fileTypeStr = file.type == FileType::Directory ? "Directory" : file.type == FileType::File ? "File"
+																																																		: "Other";
 		fmt::print("{}- {} ({} bytes) [{}]\n", indentStr, file.name, file.size_bytes, fileTypeStr);
 		for (const auto& child : file.children) {
 			printFile(child, indent + 1);

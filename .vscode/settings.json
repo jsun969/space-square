@@ -1,3 +1,6 @@
 {
-	"cSpell.words": ["spsq"]
+	"cSpell.words": ["spsq"],
+	"files.exclude": {
+		"build/_deps": true
+	}
 }

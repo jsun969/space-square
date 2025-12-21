@@ -1,8 +1,8 @@
+#include "Printer.hpp"
 #include "Scanner.hpp"
-#include "fmt/base.h"
 #include <cxxopts.hpp>
+#include <fmt/base.h>
 #include <fmt/ranges.h>
-#include <functional>
 
 int main(int argc, char* argv[]) {
 	using namespace spsq;
@@ -42,16 +42,18 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	// DEBUG
-	std::function<void(const File&, int)> printFile = [&](const File& file, int indent = 0) {
-		std::string indentStr(indent * 2, ' ');
-		auto fileTypeStr = file.type == FileType::Directory ? "Directory" : file.type == FileType::File ? "File"
-																																																		: "Other";
-		fmt::print("{}- {} ({} bytes) [{}]\n", indentStr, file.name, file.size_bytes, fileTypeStr);
-		for (const auto& child : file.children) {
-			printFile(child, indent + 1);
-		}
-	};
-	printFile(files, 0);
+	// std::function<void(const File&, int)> printFile = [&](const File& file, int indent = 0) {
+	// 	std::string indentStr(indent * 2, ' ');
+	// 	auto fileTypeStr = file.type == FileType::Directory ? "Directory" : file.type == FileType::File ? "File"
+	// 																																																	: "Other";
+	// 	fmt::print("{}- {} ({} bytes) [{}]\n", indentStr, file.name, file.size_bytes, fileTypeStr);
+	// 	for (const auto& child : file.children) {
+	// 		printFile(child, indent + 1);
+	// 	}
+	// };
+	// printFile(files, 0);
 	// DEBUG
+	Printer printer;
+	printer.print(files);
 	return 0;
 }

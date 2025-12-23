@@ -117,7 +117,7 @@ File Scanner::scan(std::string rootPath, int depth) {
 
 	// DEBUG
 	// TODO: Print files size (maybe path)
-	fmt::println("Finished scanning up to depth {}", depth);
+	// fmt::println("Finished scanning up to depth {}", depth);
 	// DEBUG
 	propagateDirSizes(root); // TODO: Use du?
 

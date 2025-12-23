@@ -10,9 +10,10 @@
 #include <string>
 #include <vector>
 
-namespace spsq {
+namespace spsq::printer {
+namespace {
 
-std::string Printer::humanizeSize(uintmax_t bytes) {
+std::string humanizeSize(uintmax_t bytes) {
 	constexpr int SUFFIX_CNT = 6, BASE = 1024;
 	constexpr std::array<std::string, SUFFIX_CNT> SUFFIXES { "KB", "MB", "GB", "TB", "PB", "EB" };
 	if (bytes < BASE) {
@@ -26,7 +27,7 @@ std::string Printer::humanizeSize(uintmax_t bytes) {
 	return fmt::format("{:.1f} {}", size, SUFFIXES[unit]);
 }
 
-ftxui::Element Printer::__debugTmpMakeBox(int dimx, int dimy) {
+ftxui::Element __debugTmpMakeBox(int dimx, int dimy) {
 	using namespace ftxui;
 
 	auto title = fmt::format("{}x{}", dimx, dimy);
@@ -35,7 +36,7 @@ ftxui::Element Printer::__debugTmpMakeBox(int dimx, int dimy) {
 				 size(WIDTH, EQUAL, dimx) | size(HEIGHT, EQUAL, dimy);
 }
 
-ftxui::Element Printer::createSquaresDom(const Squares& squares) {
+ftxui::Element createSquaresDom(const Squares& squares) {
 	using namespace ftxui;
 
 	std::vector<ftxui::Element> children;
@@ -55,7 +56,9 @@ ftxui::Element Printer::createSquaresDom(const Squares& squares) {
 	}
 }
 
-void Printer::print(const File& root) {
+} // namespace
+
+void print(const File& root) {
 	using namespace ftxui;
 	auto FileComp = [](const std::string& title) {
 		return border(vcenter(paragraphAlignCenter(title)));
@@ -113,4 +116,4 @@ void Printer::print(const File& root) {
 	screen.Loop(mainComp);
 }
 
-} // namespace spsq
+} // namespace spsq::printer

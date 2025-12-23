@@ -33,10 +33,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Scan the directory
-	Scanner scanner;
 	File files;
 	try {
-		files = scanner.scan(rootPath, depth);
+		files = scanner::scan(rootPath, depth);
 	} catch (const std::runtime_error& e) {
 		fmt::println(stderr, "Error: {}", e.what());
 		return 1;
@@ -53,7 +52,6 @@ int main(int argc, char* argv[]) {
 	// };
 	// printFile(files, 0);
 	// DEBUG
-	Printer printer;
-	printer.print(files);
+	printer::print(files);
 	return 0;
 }

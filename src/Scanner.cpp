@@ -1,14 +1,16 @@
-#include "Scanner.hpp"
+#include "File.hpp"
 #include <filesystem>
 #include <fmt/core.h>
 #include <queue>
 #include <stdexcept>
 
-namespace spsq {
+namespace spsq::scanner {
 
 namespace fs = std::filesystem;
 
-std::uintmax_t Scanner::calcDirSize(const std::string& path) {
+namespace {
+
+std::uintmax_t calcDirSize(const std::string& path) {
 	std::uintmax_t size = 0;
 	try {
 		for (const auto& entry : fs::recursive_directory_iterator(
@@ -29,7 +31,7 @@ std::uintmax_t Scanner::calcDirSize(const std::string& path) {
 	return size;
 }
 
-void Scanner::propagateDirSizes(File& file) {
+void propagateDirSizes(File& file) {
 	if (file.type != FileType::Directory) {
 		return;
 	}
@@ -46,7 +48,9 @@ void Scanner::propagateDirSizes(File& file) {
 	file.size_bytes = size;
 }
 
-File Scanner::scan(std::string rootPath, int depth) {
+} // namespace
+
+File scan(std::string rootPath, int depth) {
 	fs::path path(rootPath);
 
 	if (!fs::exists(path)) {
@@ -124,4 +128,4 @@ File Scanner::scan(std::string rootPath, int depth) {
 	return root;
 }
 
-} // namespace spsq
+} // namespace spsq::scanner

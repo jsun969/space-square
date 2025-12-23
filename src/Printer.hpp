@@ -1,20 +1,10 @@
 #pragma once
 
 #include "File.hpp"
-#include "Squares.hpp"
-#include <cstdint>
 #include <ftxui/dom/elements.hpp>
 
-namespace spsq {
+namespace spsq::printer {
 
-class Printer {
-private:
-	std::string humanizeSize(uintmax_t bytes);
-	ftxui::Element __debugTmpMakeBox(int dimx, int dimy);
-	ftxui::Element createSquaresDom(const Squares& squares);
+void print(const File& root);
 
-public:
-	void print(const File& root);
-};
-
-} // namespace spsq
+} // namespace spsq::printer

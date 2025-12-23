@@ -1,5 +1,6 @@
 #include "Printer.hpp"
 #include "File.hpp"
+#include "Squares.hpp"
 #include "fmt/format.h"
 #include <fmt/base.h>
 #include <ftxui/component/component.hpp>
@@ -25,6 +26,35 @@ std::string Printer::humanizeSize(uintmax_t bytes) {
 	return fmt::format("{:.1f} {}", size, SUFFIXES[unit]);
 }
 
+ftxui::Element Printer::__debugTmpMakeBox(int dimx, int dimy) {
+	using namespace ftxui;
+
+	auto title = fmt::format("{}x{}", dimx, dimy);
+	return window(text(title) | bold,
+								text("FILE") | dim | center) |
+				 size(WIDTH, EQUAL, dimx) | size(HEIGHT, EQUAL, dimy);
+}
+
+ftxui::Element Printer::createSquaresDom(const Squares& squares) {
+	using namespace ftxui;
+
+	std::vector<ftxui::Element> children;
+	if (!squares.squares.empty()) {
+		for (const auto& square : squares.squares) {
+			children.push_back(__debugTmpMakeBox(square.width, square.height));
+		}
+	} else {
+		for (const auto& group : squares.squareGroups) {
+			children.push_back(createSquaresDom(*group));
+		}
+	}
+	if (squares.direction == Direction::Horizontal) {
+		return hbox(children);
+	} else {
+		return vbox(children);
+	}
+}
+
 void Printer::print(const File& root) {
 	using namespace ftxui;
 	auto FileComp = [](const std::string& title) {
@@ -48,8 +78,38 @@ void Printer::print(const File& root) {
 	}
 	auto dom = FolderComp(root.name, hbox(ch));
 
+	// DEBUG
+	auto leaf1 = std::make_unique<Squares>(Squares {
+			.direction = Direction::Vertical,
+			.squares = { Square { 30, 20 }, Square { 30, 20 } },
+	});
+	auto inner1 = std::make_unique<Squares>(Squares {
+			.direction = Direction::Horizontal,
+			.squares = { Square { 12, 16 }, Square { 12, 16 }, Square { 6, 16 } },
+	});
+	auto inner2 = std::make_unique<Squares>(Squares {
+			.direction = Direction::Horizontal,
+			.squares = { Square { 17, 24 }, Square { 13, 24 } },
+	});
+	std::vector<std::unique_ptr<Squares>> innerGroups;
+	innerGroups.push_back(std::move(inner1));
+	innerGroups.push_back(std::move(inner2));
+	auto leaf2 = std::make_unique<Squares>(Squares {
+			.direction = Direction::Vertical,
+			.squareGroups = std::move(innerGroups),
+	});
+	std::vector<std::unique_ptr<Squares>> rootGroups;
+	rootGroups.push_back(std::move(leaf1));
+	rootGroups.push_back(std::move(leaf2));
+	auto mockSquares = Squares {
+		.direction = Direction::Horizontal,
+		.squareGroups = std::move(rootGroups),
+	};
+	auto mockSquaresDom = createSquaresDom(mockSquares);
+	// DEBUG
+
 	auto screen = ScreenInteractive::Fullscreen();
-	auto mainComp = Renderer([&]() { return dom; });
+	auto mainComp = Renderer([&]() { return mockSquaresDom; });
 	screen.Loop(mainComp);
 }
 

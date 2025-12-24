@@ -15,7 +15,7 @@ enum class FileType {
 struct File {
 	std::string name;
 	std::string path;
-	std::uintmax_t size_bytes;
+	std::uintmax_t sizeBytes;
 	FileType type;
 	std::vector<File> children;
 };

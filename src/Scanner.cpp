@@ -37,15 +37,15 @@ void propagateDirSizes(File& file) {
 	}
 	if (file.children.empty()) {
 		// Directory file but no children
-		file.size_bytes = calcDirSize(file.path);
+		file.sizeBytes = calcDirSize(file.path);
 		return;
 	}
 	std::uintmax_t size = 0;
 	for (auto& child : file.children) {
 		propagateDirSizes(child);
-		size += child.size_bytes;
+		size += child.sizeBytes;
 	}
-	file.size_bytes = size;
+	file.sizeBytes = size;
 }
 
 } // namespace
@@ -65,7 +65,7 @@ File scan(std::string rootPath, int depth) {
 	if (root.name.empty()) root.name = path.string();
 	root.path = fs::absolute(path).string();
 	root.type = FileType::Directory;
-	root.size_bytes = 0;
+	root.sizeBytes = 0;
 
 	// BFS scan directories
 	std::queue<File*> q;
@@ -91,13 +91,13 @@ File scan(std::string rootPath, int depth) {
 
 						if (entry.is_directory()) {
 							child.type = FileType::Directory;
-							child.size_bytes = 0;
+							child.sizeBytes = 0;
 						} else if (entry.is_regular_file()) {
 							child.type = FileType::File;
-							child.size_bytes = entry.file_size();
+							child.sizeBytes = entry.file_size();
 						} else {
 							child.type = FileType::Other;
-							child.size_bytes = 0;
+							child.sizeBytes = 0;
 						}
 
 						currentFile->children.push_back(std::move(child));

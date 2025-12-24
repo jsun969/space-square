@@ -70,7 +70,7 @@ void print(const File& root) {
 	// TODO: Use squarified treemap
 	std::vector<Element> ch;
 	for (const auto& child : root.children) {
-		auto size = humanizeSize(child.size_bytes);
+		auto size = humanizeSize(child.sizeBytes);
 		if (child.type == FileType::Directory) {
 			auto title = fmt::format("{} ({})", child.name, size);
 			ch.push_back(FolderComp(title, hbox({})));

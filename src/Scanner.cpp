@@ -48,6 +48,19 @@ void propagateDirSizes(File& file) {
 	file.sizeBytes = size;
 }
 
+void sortFilesBySize(File& file) {
+	if (file.children.empty()) {
+		return;
+	}
+	std::sort(file.children.begin(), file.children.end(),
+						[](const File& a, const File& b) { return a.sizeBytes > b.sizeBytes; });
+	for (auto& child : file.children) {
+		if (child.type == FileType::Directory) {
+			sortFilesBySize(child);
+		}
+	}
+}
+
 } // namespace
 
 File scan(std::string rootPath, int depth) {
@@ -124,6 +137,7 @@ File scan(std::string rootPath, int depth) {
 	// fmt::println("Finished scanning up to depth {}", depth);
 	// DEBUG
 	propagateDirSizes(root); // TODO: Use du?
+	sortFilesBySize(root);
 
 	return root;
 }

@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	// 	std::string indentStr(indent * 2, ' ');
 	// 	auto fileTypeStr = file.type == FileType::Directory ? "Directory" : file.type == FileType::File ? "File"
 	// 																																																	: "Other";
-	// 	fmt::print("{}- {} ({} bytes) [{}]\n", indentStr, file.name, file.size_bytes, fileTypeStr);
+	// 	fmt::print("{}- {} ({} bytes) [{}]\n", indentStr, file.name, file.sizeBytes, fileTypeStr);
 	// 	for (const auto& child : file.children) {
 	// 		printFile(child, indent + 1);
 	// 	}

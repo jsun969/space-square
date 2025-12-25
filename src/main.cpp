@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
 	options.add_options()("path", "Path to scan", cxxopts::value<std::string>()->default_value(".")) //
 			("d,depth", "Depth of directory traversal", cxxopts::value<int>()->default_value("3"))			 //
 			("h,help", "Print help information");
+	// TODO: ignore folders option
 
 	options.parse_positional({ "path" });
 	options.positional_help("[path]");

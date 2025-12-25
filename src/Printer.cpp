@@ -1,6 +1,7 @@
 #include "Printer.hpp"
 #include "File.hpp"
 #include "Squares.hpp"
+#include "Squarify.hpp"
 #include "fmt/format.h"
 #include <fmt/base.h>
 #include <ftxui/component/component.hpp>
@@ -27,13 +28,25 @@ std::string humanizeSize(uintmax_t bytes) {
 	return fmt::format("{:.1f} {}", size, SUFFIXES[unit]);
 }
 
-ftxui::Element __debugTmpMakeBox(int dimx, int dimy) {
+ftxui::Element createFileSquareDom(const Square& square) {
 	using namespace ftxui;
 
-	auto title = fmt::format("{}x{}", dimx, dimy);
-	return window(text(title) | bold,
-								text("FILE") | dim | center) |
-				 size(WIDTH, EQUAL, dimx) | size(HEIGHT, EQUAL, dimy);
+	// TODO: Improve UI
+	auto FileComp = [](const std::string& title) {
+		return border(vcenter(paragraphAlignCenter(title)));
+	};
+	auto FolderComp = [](const std::string& title, const Element& children) {
+		return window(text(title), children);
+	};
+
+	auto filesize = humanizeSize(square.file.sizeBytes);
+	if (square.file.type == FileType::Directory) {
+		auto title = fmt::format("{} ({})", square.file.name, filesize);
+		return FolderComp(title, hbox({})) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);
+	} else {
+		auto title = fmt::format("{}\n{}", square.file.name, filesize);
+		return FileComp(title) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);
+	}
 }
 
 ftxui::Element createSquaresDom(const Squares& squares) {
@@ -42,7 +55,7 @@ ftxui::Element createSquaresDom(const Squares& squares) {
 	std::vector<ftxui::Element> children;
 	if (!squares.squares.empty()) {
 		for (const auto& square : squares.squares) {
-			children.push_back(__debugTmpMakeBox(square.width, square.height));
+			children.push_back(createFileSquareDom(square));
 		}
 	} else {
 		for (const auto& group : squares.squareGroups) {
@@ -60,59 +73,31 @@ ftxui::Element createSquaresDom(const Squares& squares) {
 
 void print(const File& root) {
 	using namespace ftxui;
-	auto FileComp = [](const std::string& title) {
-		return border(vcenter(paragraphAlignCenter(title)));
-	};
-	auto FolderComp = [](const std::string& title, const Element& children) {
-		return window(text(title), children);
-	};
 
-	// TODO: Use squarified treemap
-	std::vector<Element> ch;
-	for (const auto& child : root.children) {
-		auto size = humanizeSize(child.sizeBytes);
-		if (child.type == FileType::Directory) {
-			auto title = fmt::format("{} ({})", child.name, size);
-			ch.push_back(FolderComp(title, hbox({})));
-		} else if (child.type == FileType::File) {
-			auto title = fmt::format("{}\n{}", child.name, size);
-			ch.push_back(FileComp(title));
-		}
-	}
-	auto dom = FolderComp(root.name, hbox(ch));
-
+	auto terminalSize = Terminal::Size();
+	auto squares = spsq::squarify::squarify(root, terminalSize.dimx, terminalSize.dimy);
 	// DEBUG
-	auto leaf1 = std::make_unique<Squares>(Squares {
-			.direction = Direction::Vertical,
-			.squares = { Square { 30, 20 }, Square { 30, 20 } },
-	});
-	auto inner1 = std::make_unique<Squares>(Squares {
-			.direction = Direction::Horizontal,
-			.squares = { Square { 12, 16 }, Square { 12, 16 }, Square { 6, 16 } },
-	});
-	auto inner2 = std::make_unique<Squares>(Squares {
-			.direction = Direction::Horizontal,
-			.squares = { Square { 17, 24 }, Square { 13, 24 } },
-	});
-	std::vector<std::unique_ptr<Squares>> innerGroups;
-	innerGroups.push_back(std::move(inner1));
-	innerGroups.push_back(std::move(inner2));
-	auto leaf2 = std::make_unique<Squares>(Squares {
-			.direction = Direction::Vertical,
-			.squareGroups = std::move(innerGroups),
-	});
-	std::vector<std::unique_ptr<Squares>> rootGroups;
-	rootGroups.push_back(std::move(leaf1));
-	rootGroups.push_back(std::move(leaf2));
-	auto mockSquares = Squares {
-		.direction = Direction::Horizontal,
-		.squareGroups = std::move(rootGroups),
-	};
-	auto mockSquaresDom = createSquaresDom(mockSquares);
+	// 	std::function<void(const Squares&, int)> printSquares = [&](const Squares& sq, int indent) {
+	// 		std::string pad(indent * 2, ' ');
+	// 		auto dirStr = sq.direction == Direction::Horizontal ? "Horizontal" : "Vertical";
+	// 		fmt::println("{}Group ({})", pad, dirStr);
+	//
+	// 		if (!sq.squares.empty()) {
+	// 			for (const auto& s : sq.squares) {
+	// 				fmt::println("{}  Square: {}x{} ({})", pad, s.width, s.height, s.file.name);
+	// 			}
+	// 		} else {
+	// 			for (const auto& group : sq.squareGroups) {
+	// 				printSquares(*group, indent + 1);
+	// 			}
+	// 		}
+	// 	};
+	// 	printSquares(squares, 0);
 	// DEBUG
+	auto dom = createSquaresDom(squares);
 
 	auto screen = ScreenInteractive::Fullscreen();
-	auto mainComp = Renderer([&]() { return mockSquaresDom; });
+	auto mainComp = Renderer([&]() { return dom; });
 	screen.Loop(mainComp);
 }
 

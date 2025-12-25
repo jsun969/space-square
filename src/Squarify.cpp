@@ -66,6 +66,7 @@ Squares squarify(const File& directory, int totalWidth, int totalHeight) {
 		auto setSplittedSquares = [&](std::function<double(double)> getWidth, std::function<double(double)> getHeight) {
 			for (const auto& file : curFileRow) {
 				auto area = getAreaFromSize(file->sizeBytes);
+				// TODO: Count file with 0 area and print ignored squares
 				splittedSquare->squares.push_back({ .width = static_cast<int>(getWidth(area)),
 																						.height = static_cast<int>(getHeight(area)),
 																						.file = *file });

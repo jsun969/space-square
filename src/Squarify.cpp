@@ -5,14 +5,16 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <numbers>
 #include <vector>
 
 namespace spsq::squarify {
 
 Squares squarify(const File& directory, int totalWidth, int totalHeight) {
-	// Expected square aspect ratio (width / height)
-	// 2 because typical terminal characters are about twice as tall as they are wide
-	constexpr double RATIO = 2;
+	// Expected square aspect ratio (golden ratio)
+	constexpr double RATIO = std::numbers::phi;
+	// Typical screen character height / width
+	constexpr double HEIGHT_TO_WIDTH = 2;
 
 	const auto& files = directory.children;
 	const double totalSize = static_cast<double>(directory.sizeBytes);
@@ -48,8 +50,10 @@ Squares squarify(const File& directory, int totalWidth, int totalHeight) {
 			auto newSize = curSize + files[j].sizeBytes;
 			auto newArea = getAreaFromSize(newSize);
 			auto newDynSide = newArea / fixedSide;
-			// width / height
-			double aspectRatio = outerDirection == Direction::Vertical ? fixedSide / newDynSide : newDynSide / fixedSide;
+			// Get actual length from terminal character size ratio
+			double widthLength = (outerDirection == Direction::Vertical ? fixedSide : newDynSide) * HEIGHT_TO_WIDTH;
+			double heightLength = outerDirection == Direction::Vertical ? newDynSide : fixedSide;
+			double aspectRatio = std::max(widthLength / heightLength, heightLength / widthLength);
 			if (j > i) {
 				// Check if aspect ratio is getting worse
 				if (std::abs(aspectRatio - RATIO) > std::abs(prevAspectRatio - RATIO)) {

@@ -41,6 +41,7 @@ ftxui::Element createFileSquareDom(const Square& square) {
 
 	auto filesize = humanizeSize(square.file.sizeBytes);
 	if (square.file.type == FileType::Directory) {
+		// TODO: Show children inside
 		auto title = fmt::format("{} ({})", square.file.name, filesize);
 		return FolderComp(title, hbox({})) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);
 	} else {

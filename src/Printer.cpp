@@ -28,6 +28,9 @@ std::string humanizeSize(uintmax_t bytes) {
 	return fmt::format("{:.1f} {}", size, SUFFIXES[unit]);
 }
 
+// Forward declaration for mutual recursion
+ftxui::Element createSquaresDom(const Squares& squares);
+
 ftxui::Element createFileSquareDom(const Square& square) {
 	using namespace ftxui;
 
@@ -41,9 +44,18 @@ ftxui::Element createFileSquareDom(const Square& square) {
 
 	auto filesize = humanizeSize(square.file.sizeBytes);
 	if (square.file.type == FileType::Directory) {
-		// TODO: Show children inside
 		auto title = fmt::format("{} ({})", square.file.name, filesize);
-		return FolderComp(title, hbox({})) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);
+		// Recursively squarify and render children inside the folder
+		int innerWidth = square.width - 2;
+		int innerHeight = square.height - 2;
+		Element childrenDom = hbox({});
+		if (innerWidth > 0 && innerHeight > 0 && !square.file.children.empty()) {
+			// Create a temporary parent file to squarify children
+			File tempParent = square.file;
+			auto childSquares = spsq::squarify::squarify(tempParent, innerWidth, innerHeight);
+			childrenDom = createSquaresDom(childSquares);
+		}
+		return FolderComp(title, childrenDom) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);
 	} else {
 		auto title = fmt::format("{}\n{}", square.file.name, filesize);
 		return FileComp(title) | size(WIDTH, EQUAL, square.width) | size(HEIGHT, EQUAL, square.height);

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.29.0)
 
-project(spsq VERSION 0.0.2)
+project(spsq VERSION 0.0.3)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

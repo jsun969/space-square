@@ -33,6 +33,8 @@ FetchContent_MakeAvailable(cxxopts)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(spsq ${SOURCES})
 
+target_compile_definitions(spsq PRIVATE SPSQ_VERSION=\"${PROJECT_VERSION}\")
+
 target_link_libraries(spsq PRIVATE fmt::fmt)
 target_link_libraries(spsq
   PRIVATE ftxui::screen

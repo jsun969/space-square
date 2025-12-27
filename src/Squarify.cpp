@@ -1,6 +1,7 @@
 #include "Squarify.hpp"
 #include "File.hpp"
 #include "Squares.hpp"
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>

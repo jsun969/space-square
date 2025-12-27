@@ -1,4 +1,5 @@
 #include "File.hpp"
+#include <algorithm>
 #include <filesystem>
 #include <fmt/core.h>
 #include <queue>

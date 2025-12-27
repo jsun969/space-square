@@ -3,6 +3,7 @@
 #include "Squares.hpp"
 #include "Squarify.hpp"
 #include "fmt/format.h"
+#include <array>
 #include <fmt/base.h>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>

@@ -9,6 +9,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace spsq::printer {
@@ -16,7 +17,7 @@ namespace {
 
 std::string humanizeSize(uintmax_t bytes) {
 	constexpr int SUFFIX_CNT = 6, BASE = 1024;
-	constexpr std::array<std::string, SUFFIX_CNT> SUFFIXES { "KB", "MB", "GB", "TB", "PB", "EB" };
+	constexpr std::array<std::string_view, SUFFIX_CNT> SUFFIXES { "KB", "MB", "GB", "TB", "PB", "EB" };
 	if (bytes < BASE) {
 		return fmt::format("{} B", bytes);
 	}

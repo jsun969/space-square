@@ -19,7 +19,14 @@ int main(int argc, char* argv[]) {
 	options.parse_positional({ "path" });
 	options.positional_help("[path]");
 
-	auto result = options.parse(argc, argv);
+	cxxopts::ParseResult result;
+	try {
+		result = options.parse(argc, argv);
+	} catch (const cxxopts::exceptions::exception& e) {
+		fmt::println(stderr, "Illegal option: {}", e.what());
+		fmt::println("\n{}", options.help());
+		return 1;
+	}
 
 	if (result.count("help")) {
 		fmt::println("{}", options.help());

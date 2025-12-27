@@ -26,11 +26,6 @@ jobs:
             cpp_compiler: g++
             artifact_name: spsq
             asset_name: spsq-linux-x64
-          - os: macos-13
-            c_compiler: clang
-            cpp_compiler: clang++
-            artifact_name: spsq
-            asset_name: spsq-macos-intel
           - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
